@@ -22,7 +22,7 @@ script: |
   sudo aptitude full-upgrade -y
   
   
-  echo -e "\033[1m###  Getting exclusive Stackage packages...  #################################\033[m"
+  echo -e "\033[1m###  Getting Stackage packages...  ###########################################\033[m"
   STACKAGE_PACKAGES=`wget -q -O - ${STACKAGE}/${STACKAGE_BRANCH}/metadata | tr '\n' ' ' | sed 's/.*Packages from Hackage ===================== //' | tr ' ' '\n' | grep -v $PACKAGES_NO_INSTALL | tr '\n' ' '`
   echo ${STACKAGE}/${STACKAGE_BRANCH}/metadata
   echo Stackage packages that will be installed:
@@ -30,7 +30,7 @@ script: |
   
   
   echo -e "\033[1m###  Installing Stackage packages...  ########################################\033[m"
-  cabal_install_insist $STACKAGE_EXCLUSIVE_PACKAGES
+  cabal_install_insist $STACKAGE_PACKAGES
   
   
   echo -e "\033[1m###  Final check  ############################################################\033[m"
