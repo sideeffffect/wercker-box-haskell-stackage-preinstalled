@@ -1,0 +1,79 @@
+name: haskell-stackage-preinstalled
+version: 2.0.0
+inherits: ondrapelech/haskell-stackage@3.0.0
+description: wercker box for the GHC 7.8 and the latest LTS Stackage snapshot, with all packages preinstalled
+type: main
+platform: ubuntu@12.04
+keywords:
+  - haskell
+  - stackage
+  - ubuntu
+  - 14.10
+script: |
+  PACKAGES_NO_INSTALL='hfsevents\|lhs2tex\|Win32-notify' # packages to not install
+  STACKAGE="https://www.stackage.org"
+  STACKAGE_BRANCH="lts"
+  
+  function cabal_install_insist { until cabal install -j "$@" ; do echo -e "\033[1mcabal install failed, trying again...\033[m" ; done }
+  
+  
+  echo -e "\033[1m###  Upgrading system packages...  ###########################################\033[m"
+  sudo aptitude update
+  sudo aptitude full-upgrade -y
+  
+  
+  echo -e "\033[1m###  Getting exclusive Stackage packages...  #################################\033[m"
+  STACKAGE_PACKAGES=`wget -q -O - ${STACKAGE}/${STACKAGE_BRANCH}/metadata | tr '\n' ' ' | sed 's/.*Packages from Hackage ===================== //' | tr ' ' '\n' | grep -v $PACKAGES_NO_INSTALL | tr '\n' ' '`
+  echo ${STACKAGE}/${STACKAGE_BRANCH}/metadata
+  echo Stackage packages that will be installed:
+  echo $STACKAGE_PACKAGES | tr ' ' '\n'
+  
+  
+  echo -e "\033[1m###  Installing Stackage packages...  ########################################\033[m"
+  cabal_install_insist $STACKAGE_EXCLUSIVE_PACKAGES
+  
+  
+  echo -e "\033[1m###  Final check  ############################################################\033[m"
+  
+  which ghc
+  ghc --version
+  which cabal
+  cabal --version
+  ghc-pkg list
+  echo
+  
+  
+  echo -e "\033[1m###  FINISHED  ###############################################################\033[m"
+
+
+box-detect:
+  priority: 1000
+  version :
+  detect:
+    - files:
+      - '*.cabal'
+
+default-build:
+  haskell:
+    priority: 50
+    detect:
+      - default: true
+    text-to-append: |
+      # Build definition
+      build:
+        # The steps that will be executed on build
+        steps:
+          - script:
+              name: install dependencies
+              code: |
+                cabal install --enable-tests --only-dependencies
+          - script:
+              name: build package
+              code: |
+                cabal configure --enable-tests
+                cabal build
+          - script:
+              name: test package
+              code: |
+                cabal test --show-details=always
+
