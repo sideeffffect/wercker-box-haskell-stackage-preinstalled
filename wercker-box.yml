@@ -1,6 +1,6 @@
 name: haskell-stackage-preinstalled
 version: 2.0.0
-inherits: ondrapelech/haskell-stackage@3.0.0
+inherits: ondrapelech/haskell-stackage@3.0.1
 description: wercker box for the GHC 7.8 and the latest LTS Stackage snapshot, with all packages preinstalled
 type: main
 platform: ubuntu@12.04
@@ -10,7 +10,7 @@ keywords:
   - ubuntu
   - 14.10
 script: |
-  PACKAGES_NO_INSTALL='hfsevents\|lhs2tex\|Win32-notify\|bin-package-db\|rts\|ghc' # packages to not install
+  PACKAGES_NO_INSTALL='hfsevents\|lhs2tex\|Win32-notify\|bin-package-db\|rts\|ghc\|sdl2\|cryptol' # packages to not install
   STACKAGE="https://www.stackage.org"
   STACKAGE_BRANCH="lts"
   
